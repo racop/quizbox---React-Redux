@@ -1,0 +1,8 @@
+{
+    "reactSnippets.settings.prettierEnabled": false,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    "prettier.printWidth": 120
+}

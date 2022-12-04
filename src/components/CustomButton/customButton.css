@@ -1,0 +1,26 @@
+.btn-primary {
+  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 2px;
+  background-color: #4649ff;
+}
+
+.btn-primary:hover {
+  background-color: #393cd1 !important;
+}
+.btn-primary:disabled:hover {
+  background-color: transparent !important;
+}
+
+.btn-default {
+  text-transform: uppercase;
+  background: #fff;
+  font-weight: 500;
+  border: 1px solid #4649ff;
+  letter-spacing: 2px;
+  color: #4649ff;
+}
+
+.btn-default:hover {
+  background-color: #393bce17 !important;
+}

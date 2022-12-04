@@ -1,0 +1,15 @@
+.header-wrapper {
+  padding: 1rem 2rem;
+  background: #21244f;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-wrapper > .logo {
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-weight: 700;
+  font-size: 1.25rem;
+}

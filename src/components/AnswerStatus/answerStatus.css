@@ -1,0 +1,9 @@
+.q-remarks > .timeout {
+  color: #ffba47;
+}
+.q-remarks > .incorrect {
+  color: #fa4873;
+}
+.q-remarks > .correct {
+  color: #1fd77c;
+}
