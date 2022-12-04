@@ -18,6 +18,7 @@ import "./takeQuizModal.css";
 const TakeQuizModal = (props) => {
   const { timer, handleClose, isModalOpen, questions, id, score, questionIndex } = props;
   const [activeQid, setActiveQid] = useState({});
+  const [errors, setErrors] = useState({});
   const { getOperator, getCorrectAnswer } = useQuizBox();
   const [currentAnswer, setCurrentAnswer] = useState("");
   const dispatch = useDispatch();
@@ -31,7 +32,6 @@ const TakeQuizModal = (props) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    console.log("quizQuestions ", questions, id, questionIndex);
     setActiveQid({ index: questionIndex, id: questions[questionIndex].id });
     runTimeCounter(timeCounter);
     return () => {
@@ -58,6 +58,16 @@ const TakeQuizModal = (props) => {
     }, 1000);
     setTimeoutId(tId);
   };
+  const updateErrors = (key, msg) => {
+    if (!empty(msg)) setErrors((prev) => ({ ...prev, [key]: msg }));
+    else {
+      setErrors((prev) => {
+        const _errors = { ...prev };
+        delete _errors[key];
+        return _errors;
+      });
+    }
+  };
 
   const evaluateQuestion = () => {
     let remarks = "Wrong";
@@ -66,11 +76,11 @@ const TakeQuizModal = (props) => {
       questions[activeQid.index].x,
       questions[activeQid.index].y,
       questions[activeQid.index].operator
-    ).toFixed(2);
+    );
     if (timeCounter === 0 && currentAnswer === "") {
       // Timed out
       remarks = "timeout";
-    } else if (parseFloat(currentAnswer) !== parseFloat(correctAns)) {
+    } else if (Math.round(currentAnswer) !== Math.round(correctAns)) {
       // Answer is wrong
       remarks = "incorrect";
     } else {
@@ -86,7 +96,6 @@ const TakeQuizModal = (props) => {
   };
 
   const handleQuestionSubmit = () => {
-    console.log("sub start");
     // Set mode to 1 to enable preview for current input
     quizModeRef.current = 1;
     setQuizMode(1); // Enable preview winodw, disable input window
@@ -94,7 +103,6 @@ const TakeQuizModal = (props) => {
     const { remarks, score } = evaluateQuestion();
     response.remarks = remarks;
     response.timeCounter = timeCounter;
-    console.log("res ", response);
     dispatch(
       addQuizAnswer({
         quizId: id,
@@ -106,18 +114,14 @@ const TakeQuizModal = (props) => {
     if (questions.length === activeQid.index + 1) {
       dispatch(updateQuizStatus({ quizId: id, status: "completed" }));
     }
-    console.log("sub end");
-    console.log("activeQid", activeQid, questions[activeQid.index].x);
   };
 
   const continueToNext = () => {
     quizModeRef.current = 0; // Reset mode to 0
-    console.log("activeQid ", activeQid);
     if (questions.length === activeQid.index + 1) {
       // Reached final question, launch preview
       setQuizMode(2); // Enable preview
       setIsResultModalOpen(true); // Open Result Preview Modal
-      console.log("continueToNext close modal, ope res");
       return;
     } else {
       setQuizMode(0);
@@ -131,19 +135,24 @@ const TakeQuizModal = (props) => {
     setCurrentAnswer(""); // Reset input field
   };
 
-  const handleChange = (v) => {
+  const handleChange = (key, v) => {
     setCurrentAnswer(v);
+    if (empty(v)) {
+      updateErrors(key, "Answer can not be empty!");
+    } else if (!v.match(/^[0-9]+$/)) {
+      updateErrors(key, "Input should only be numbers");
+    }
   };
+
+  const isSubmitDisabled = empty(currentAnswer) || Object.keys(errors).length > 0;
 
   const closeResultModal = () => {
     setIsResultModalOpen(false);
     handleClose(); // Close take Quiz modal
   };
 
-  const getLabel = () => {
-    return `${questions[activeQid.index].x} ${getOperator(questions[activeQid.index].operator)} ${
-      questions[activeQid.index].y
-    } = ?`;
+  const getLabel = (question) => {
+    return `${question.x} ${getOperator(question.operator)} ${question.y} = ?`;
   };
   return (
     <>
@@ -162,21 +171,24 @@ const TakeQuizModal = (props) => {
                   <QuizBoxField
                     name={"answer"}
                     labelClass="input-answer"
-                    label={getLabel()}
+                    label={getLabel(questions[activeQid.index])}
                     type={"text"}
                     placeholder={"Input answer"}
-                    onChange={(v) => handleChange(v)}
+                    onChange={(v) => handleChange("answer", v)}
                   />
+                  {errors["answer"] && <span className="error-txt">{errors["answer"]}</span>}
                 </div>
                 <div className="input-submit">
-                  <CustomButton onClick={handleQuestionSubmit}>Next</CustomButton>
+                  <CustomButton disabled={isSubmitDisabled} onClick={handleQuestionSubmit}>
+                    Next
+                  </CustomButton>
                 </div>
               </>
             )}
 
             {questions && questions[activeQid.index] && quizMode === 1 && (
               <>
-                <label className="input-answer">{getLabel()}</label>
+                <label className="input-answer">{getLabel(questions[activeQid.index])}</label>
                 {!empty(currentAnswer) && (
                   <div className="input-response">
                     <span>Your response:</span> {currentAnswer}

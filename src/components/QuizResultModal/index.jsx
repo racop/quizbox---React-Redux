@@ -2,25 +2,24 @@ import { List, Modal, Progress } from "antd";
 import React from "react";
 import { useQuizBox } from "../../hooks/useQuizBox";
 import { empty } from "../../utils/common";
+import { Colors, CORRECT, INCORRECT, TIMEOUT } from "../../utils/constants";
 
 const QuizResultModal = (props) => {
   const { isModalOpen, handleClose, questions, score } = props;
   const { getCorrectAnswer, getOperator } = useQuizBox();
 
   const pullAnswers = (q) => {
-    let remarks = "Wrong";
-    const correctAns = getCorrectAnswer(q.x, q.y, q.operator);
-    console.log("q.answer.answer ", q.answer.answer, correctAns);
+    let remarks = INCORRECT;
+    const correctAns = Math.round(getCorrectAnswer(q.x, q.y, q.operator));
     if (q.answer.timeCounter === 0 && q.answer.answer === "") {
       // Timed out
-      remarks = "timeout";
+      remarks = TIMEOUT;
     } else if (parseFloat(q.answer.answer) !== parseFloat(correctAns)) {
       // Answer is wrong
-      remarks = "incorrect";
+      remarks = INCORRECT;
     } else {
-      console.log("wrong ", parseFloat(q.answer.answer), parseFloat(correctAns));
       // Answer is correct
-      remarks = "correct";
+      remarks = CORRECT;
     }
     return {
       correctAnswer: correctAns,
@@ -30,9 +29,9 @@ const QuizResultModal = (props) => {
 
   const getStatusIcons = (key) => {
     switch (key) {
-      case "incorrect":
+      case INCORRECT:
         return "❌";
-      case "timeout":
+      case TIMEOUT:
         return "⚠️";
       default:
         return "✅";
@@ -40,9 +39,9 @@ const QuizResultModal = (props) => {
   };
   const getStatusClasses = (item) => {
     switch (item.answer.remarks) {
-      case "incorrect":
+      case INCORRECT:
         return "red-text";
-      case "timeout":
+      case TIMEOUT:
         return "yellow-text";
       default:
         return "green-text";
@@ -53,14 +52,14 @@ const QuizResultModal = (props) => {
     const strokes = [];
     questions.map((question) => {
       switch (question.answer.remarks) {
-        case "incorrect":
-          strokes.push("#fa4873");
+        case INCORRECT:
+          strokes.push(Colors.themeRed);
           break;
-        case "timeout":
-          strokes.push("#ffba47");
+        case TIMEOUT:
+          strokes.push(Colors.themeYellow);
           break;
         default:
-          strokes.push("#1fd77c");
+          strokes.push(Colors.themeGreen);
           break;
       }
       return question;
@@ -99,16 +98,6 @@ const QuizResultModal = (props) => {
             {score}/{questions.length}
           </div>
         </div>
-
-        {/* {questions.map((q) => (
-          <>
-            <label>
-              {q.x} {getOperator(q.operator)} {q.y}
-            </label>
-            <div>Your answer: {q.answer.answer}</div>
-            <AnswerStatus type={pullAnswers(q).remarks} />
-          </>
-        ))} */}
       </>
     </Modal>
   );

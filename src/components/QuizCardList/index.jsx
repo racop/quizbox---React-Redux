@@ -20,7 +20,6 @@ const QuizCard = ({ quiz, index }) => {
     setqid(qid);
     setIsModalOpen(true);
     newQuestionIndex === 0 && dispatch(updateQuizStatus({ quizId: qid, status: "started" }));
-    console.log(qid, "started");
   };
 
   const handleShowResultClick = () => {

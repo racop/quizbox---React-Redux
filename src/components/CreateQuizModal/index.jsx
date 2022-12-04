@@ -17,7 +17,6 @@ const CreateQuizModal = (props) => {
   const dispatch = useDispatch();
 
   const updateErrors = (keys, msg) => {
-    console.log(keys, msg);
     if (typeof keys === "object" && keys.length > 0) {
       if (!empty(msg)) {
         keys.map((key) => setErrors((prev) => ({ ...prev, [key]: msg })));
@@ -84,17 +83,8 @@ const CreateQuizModal = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Check errors on submit
-    const formKeys = formSchema.map((f) => f.name);
-    console.log("formKeys ", formKeys, Object.keys(errors).length);
-    // formKeys.map((f) => evaluateErrors(f, quizMaker[f]));
-
-    if (Object.keys(errors).length > 0) {
-      return;
-    } else {
-      console.log("value ", quizMaker);
-      dispatch(addNewQuiz(quizMaker));
-      handleClose();
-    }
+    dispatch(addNewQuiz(quizMaker));
+    handleClose();
   };
 
   const isSubmitDisabled =
@@ -126,6 +116,10 @@ const CreateQuizModal = (props) => {
             {errors[f.name] && <span className="error-txt">{errors[f.name]}</span>}
           </div>
         ))}
+        <div>
+          <span style={{ fontWeight: "bold" }}>Note: </span> Decimal Results in division will be rounded to the nearest
+          integer
+        </div>
         <div className="btn">
           <CustomButton key="back" variant="ghost" onClick={handleClose}>
             Cancel
